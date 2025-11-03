@@ -7,10 +7,11 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const PhoneLoginScreen = () => {
+const PartnerPhoneLoginScreen = () => {
   const navigation = useNavigation();
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
@@ -42,69 +43,71 @@ const PhoneLoginScreen = () => {
       return;
     }
     // Здесь будет API проверки кода
-    Alert.alert('Успешно', 'Вход выполнен!');
-    // navigation.navigate('Main'); // Переход на главный экран
+    Alert.alert('Успешно', 'Вход для партнера выполнен!');
+    // navigation.navigate('PartnerMain');
   };
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Шапка */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>← Назад</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Text style={styles.backButtonText}>‹</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Вход по телефону</Text>
+        <Text style={styles.title}>Вход для партнеров</Text>
         <View style={styles.placeholder} />
       </View>
 
-      <View style={styles.content}>
-        {step === 1 ? (
-          <>
-            <Text style={styles.titleLarge}>Введите ваш телефон</Text>
-            <Text style={styles.subtitle}>Мы отправим код в SMS</Text>
-            
-            <View style={styles.phoneContainer}>
-              <TextInput
-                style={styles.phoneInput}
-                value={phone}
-                onChangeText={(text) => setPhone(formatPhone(text))}
-                keyboardType="phone-pad"
-                placeholder="+7 (999) 999-99-99"
-                maxLength={18}
-              />
-            </View>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.content}>
+          {step === 1 ? (
+            <>
+              <Text style={styles.titleLarge}>Введите телефон организации</Text>
+              <Text style={styles.subtitle}>Мы отправим код в SMS для входа в партнерский аккаунт</Text>
+              
+              <View style={styles.phoneContainer}>
+                <TextInput
+                  style={styles.phoneInput}
+                  value={phone}
+                  onChangeText={(text) => setPhone(formatPhone(text))}
+                  keyboardType="phone-pad"
+                  placeholder="+7 (999) 999-99-99"
+                  maxLength={18}
+                />
+              </View>
 
-            <TouchableOpacity style={styles.continueButton} onPress={handleSendCode}>
-              <Text style={styles.continueButtonText}>Получить код</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <Text style={styles.titleLarge}>Введите код из SMS</Text>
-            <Text style={styles.subtitle}>Отправлен на {phone}</Text>
-            
-            <View style={styles.codeContainer}>
-              <TextInput
-                style={styles.codeInput}
-                value={code}
-                onChangeText={setCode}
-                keyboardType="number-pad"
-                placeholder="1234"
-                maxLength={4}
-                textAlign="center"
-              />
-            </View>
+              <TouchableOpacity style={styles.continueButton} onPress={handleSendCode}>
+                <Text style={styles.continueButtonText}>Получить код</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <Text style={styles.titleLarge}>Введите код из SMS</Text>
+              <Text style={styles.subtitle}>Отправлен на {phone}</Text>
+              
+              <View style={styles.codeContainer}>
+                <TextInput
+                  style={styles.codeInput}
+                  value={code}
+                  onChangeText={setCode}
+                  keyboardType="number-pad"
+                  placeholder="1234"
+                  maxLength={4}
+                  textAlign="center"
+                />
+              </View>
 
-            <TouchableOpacity style={styles.continueButton} onPress={handleVerifyCode}>
-              <Text style={styles.continueButtonText}>Войти</Text>
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.continueButton} onPress={handleVerifyCode}>
+                <Text style={styles.continueButtonText}>Войти в партнерский аккаунт</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity style={styles.resendButton} onPress={handleSendCode}>
-              <Text style={styles.resendText}>Отправить код повторно</Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
+              <TouchableOpacity style={styles.resendButton} onPress={handleSendCode}>
+                <Text style={styles.resendText}>Отправить код повторно</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -124,7 +127,11 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E0E0E0',
   },
   backButton: {
-    fontSize: 16,
+    padding: 8,
+    width: 40,
+  },
+  backButtonText: {
+    fontSize: 24,
     color: '#000000',
   },
   title: {
@@ -134,6 +141,9 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     width: 40,
+  },
+  scrollContainer: {
+    flexGrow: 1,
   },
   content: {
     flex: 1,
@@ -153,6 +163,7 @@ const styles = StyleSheet.create({
     color: '#666666',
     marginBottom: 48,
     textAlign: 'center',
+    lineHeight: 22,
   },
   phoneContainer: {
     width: '100%',
@@ -179,6 +190,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     backgroundColor: '#FFFFFF',
+    textAlign: 'center',
   },
   continueButton: {
     backgroundColor: '#000000',
@@ -203,4 +215,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PhoneLoginScreen;
+export default PartnerPhoneLoginScreen;
