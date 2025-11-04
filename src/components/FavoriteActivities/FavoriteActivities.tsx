@@ -1,36 +1,54 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
-import { Star, MapPin } from 'phosphor-react-native';
-
-interface Activity {
-  id: string;
-  name: string;
-  type: string;
-  rating: number;
-  price: string;
-  image: string;
-  location: string;
-}
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Alert } from 'react-native';
+import { Star, MapPin, Heart } from 'phosphor-react-native';
+import { Activity } from '../../types/api';
+import { useFavorites } from '../../contexts/FavoritesContext';
 
 interface FavoriteActivitiesProps {
-  activities: Activity[];
   onActivityPress: (activity: Activity) => void;
   onSeeAllPress: () => void;
 }
 
 const FavoriteActivities: React.FC<FavoriteActivitiesProps> = ({ 
-  activities, 
   onActivityPress, 
   onSeeAllPress 
 }) => {
-  if (activities.length === 0) {
+  const { favorites, isLoading, removeFromFavorites } = useFavorites();
+
+  const handleRemoveFavorite = async (activityId: string, event: any) => {
+    event.stopPropagation();
+    await removeFromFavorites(activityId);
+  };
+
+  const handleActivityPress = (activity: Activity) => {
+    onActivityPress(activity);
+  };
+
+  if (isLoading) {
     return (
-      <View style={styles.emptyState}>
-        <Star size={48} color="#E5E5EA" weight="light" />
-        <Text style={styles.emptyTitle}>Пока нет избранного</Text>
-        <Text style={styles.emptyText}>
-          Добавляйте занятия в избранное,{'\n'}чтобы быстро находить их позже
-        </Text>
+      <View style={styles.container}>
+        <Text style={styles.title}>Избранное</Text>
+        <View style={styles.loadingContainer}>
+          <Text>Загружаем избранное...</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (favorites.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Избранное</Text>
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyIcon}>❤️</Text>
+          <Text style={styles.emptyTitle}>Пока нет избранного</Text>
+          <Text style={styles.emptyDescription}>
+            Добавляйте занятия в избранное, чтобы быстро находить их позже
+          </Text>
+          <TouchableOpacity style={styles.emptyAction} onPress={onSeeAllPress}>
+            <Text style={styles.emptyActionText}>Найти занятия</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -49,13 +67,20 @@ const FavoriteActivities: React.FC<FavoriteActivitiesProps> = ({
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.activitiesContainer}
       >
-        {activities.map((activity) => (
+        {favorites.map((activity) => (
           <TouchableOpacity
             key={activity.id}
             style={styles.activityCard}
-            onPress={() => onActivityPress(activity)}
+            onPress={() => handleActivityPress(activity)}
           >
-            <Image source={{ uri: activity.image }} style={styles.activityImage} />
+            <TouchableOpacity 
+              style={styles.favoriteButton}
+              onPress={(event) => handleRemoveFavorite(activity.id, event)}
+            >
+              <Heart size={20} color="#FF3B30" weight="fill" />
+            </TouchableOpacity>
+
+            <Image source={{ uri: activity.images[0] }} style={styles.activityImage} />
             <View style={styles.activityInfo}>
               <Text style={styles.activityName} numberOfLines={2}>
                 {activity.name}
@@ -67,10 +92,10 @@ const FavoriteActivities: React.FC<FavoriteActivitiesProps> = ({
               <View style={styles.locationContainer}>
                 <MapPin size={10} color="#8E8E93" />
                 <Text style={styles.location} numberOfLines={1}>
-                  {activity.location}
+                  {activity.location.address}
                 </Text>
               </View>
-              <Text style={styles.price}>{activity.price}</Text>
+              <Text style={styles.price}>{activity.price} ₽/мес</Text>
             </View>
           </TouchableOpacity>
         ))}
@@ -117,6 +142,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,
+    position: 'relative',
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    zIndex: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 16,
+    padding: 6,
   },
   activityImage: {
     width: '100%',
@@ -161,23 +196,43 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#007AFF',
   },
+  loadingContainer: {
+    padding: 40,
+    alignItems: 'center',
+  },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: 40,
-    paddingHorizontal: 20,
+    justifyContent: 'center',
+    padding: 40,
+  },
+  emptyIcon: {
+    fontSize: 48,
+    marginBottom: 16,
   },
   emptyTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#000000',
-    marginTop: 16,
     marginBottom: 8,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#8E8E93',
     textAlign: 'center',
-    lineHeight: 18,
+  },
+  emptyDescription: {
+    fontSize: 14,
+    color: '#666666',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  emptyAction: {
+    backgroundColor: '#000000',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  emptyActionText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 

@@ -1,4 +1,4 @@
-// src/screens/main/MainScreen.tsx - С ПРАВИЛЬНЫМ ВЫРАВНИВАНИЕМ ЛОГОТИПА
+// src/screens/main/MainScreen.tsx - ПОЛНЫЙ КОД С РАБОЧИМ ПОИСКОМ
 import React, { useState } from 'react';
 import {
   View,
@@ -10,6 +10,7 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { 
   MagnifyingGlass, 
   Bell, 
@@ -27,6 +28,7 @@ import BannerCarousel from '../../components/BannerCarousel';
 const { width } = Dimensions.get('window');
 
 const MainScreen: React.FC = () => {
+  const navigation = useNavigation();
   const [currentLocation, setCurrentLocation] = useState('Москва');
 
   // Mock данные для избранного
@@ -104,8 +106,9 @@ const MainScreen: React.FC = () => {
     }
   };
 
+  // РАБОЧИЙ ПОИСК - ОТКРЫВАЕТ ЭКРАН ПОИСКА
   const handleSearchPress = () => {
-    Alert.alert('Поиск', 'Открыть экран поиска (в разработке)');
+    navigation.navigate('Search' as never);
   };
 
   const handleNotificationsPress = () => {
@@ -145,7 +148,7 @@ const MainScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Поиск */}
+        {/* Поиск - ТЕПЕРЬ РАБОЧАЯ КНОПКА */}
         <TouchableOpacity style={styles.searchContainer} onPress={handleSearchPress}>
           <View style={styles.searchInput}>
             <MagnifyingGlass size={20} color="#8E8E93" />

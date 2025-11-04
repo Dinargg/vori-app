@@ -1,4 +1,4 @@
-// App.tsx - ОБНОВЛЕННЫЙ КОД С ERROR BOUNDARY
+// App.tsx - ПОЛНЫЙ КОД С ДОБАВЛЕНИЕМ SEARCH SCREEN
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -8,6 +8,7 @@ import { House, Calendar, User, MagnifyingGlass } from 'phosphor-react-native';
 
 // Error Boundary
 import ErrorBoundary from './src/components/ErrorBoundary/ErrorBoundary';
+import { FavoritesProvider } from './src/contexts/FavoritesContext';
 
 // ВКЛЮЧАЕМ ЛОГИРОВАНИЕ ВСЕХ ОШИБОК
 LogBox.ignoreAllLogs(false); // Показывать ВСЕ логи и предупреждения
@@ -29,6 +30,7 @@ import MainScreen from './src/screens/main/MainScreen';
 import ActivitiesScreen from './src/screens/main/ActivitiesScreen';
 import BookingsScreen from './src/screens/main/BookingsScreen';
 import ProfileScreen from './src/screens/main/ProfileScreen';
+import SearchScreen from './src/screens/main/SearchScreen'; // ДОБАВЛЯЕМ ИМПОРТ
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -98,36 +100,41 @@ const App = () => {
   console.log('App component rendered'); // Лог для отладки
   return (
     <ErrorBoundary>
-      <NavigationContainer>
-        <Stack.Navigator 
-          initialRouteName="Login"
-          screenOptions={{ 
-            headerShown: false,
-            animation: 'slide_from_right'
-          }}
-        >
-          {/* Auth Screens */}
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Registration" component={RegistrationScreen} />
-          <Stack.Screen name="PhoneLogin" component={PhoneLoginScreen} />
-          <Stack.Screen name="TermsOfService" component={TermsOfServiceScreen} />
-          <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
-          
-          {/* Partner Screens */}
-          <Stack.Screen name="PartnerChoice" component={PartnerChoiceScreen} />
-          <Stack.Screen name="PartnerPhoneLogin" component={PartnerPhoneLoginScreen} />
-          <Stack.Screen name="PartnerRegistration" component={PartnerRegistrationScreen} />
-          
-          {/* Main Tabs */}
-          <Stack.Screen name="MainTabs" component={MainTabs} />
-          
-          {/* Individual Main Screens (for direct navigation) */}
-          <Stack.Screen name="Main" component={MainScreen} />
-          <Stack.Screen name="Activities" component={ActivitiesScreen} />
-          <Stack.Screen name="Bookings" component={BookingsScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <FavoritesProvider>
+        <NavigationContainer>
+          <Stack.Navigator 
+            initialRouteName="Login"
+            screenOptions={{ 
+              headerShown: false,
+              animation: 'slide_from_right'
+            }}
+          >
+            {/* Auth Screens */}
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Registration" component={RegistrationScreen} />
+            <Stack.Screen name="PhoneLogin" component={PhoneLoginScreen} />
+            <Stack.Screen name="TermsOfService" component={TermsOfServiceScreen} />
+            <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+            
+            {/* Partner Screens */}
+            <Stack.Screen name="PartnerChoice" component={PartnerChoiceScreen} />
+            <Stack.Screen name="PartnerPhoneLogin" component={PartnerPhoneLoginScreen} />
+            <Stack.Screen name="PartnerRegistration" component={PartnerRegistrationScreen} />
+            
+            {/* Main Tabs */}
+            <Stack.Screen name="MainTabs" component={MainTabs} />
+            
+            {/* Individual Main Screens (for direct navigation) */}
+            <Stack.Screen name="Main" component={MainScreen} />
+            <Stack.Screen name="Activities" component={ActivitiesScreen} />
+            <Stack.Screen name="Bookings" component={BookingsScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            
+            {/* Search Screen - ДОБАВЛЯЕМ НОВЫЙ ЭКРАН */}
+            <Stack.Screen name="Search" component={SearchScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </FavoritesProvider>
     </ErrorBoundary>
   );
 };
