@@ -1,5 +1,5 @@
-// src/screens/main/ActivitiesScreen.tsx - ПОЛНЫЙ ОБНОВЛЕННЫЙ КОД
-import React, { useState } from 'react';
+// src/screens/main/ActivitiesScreen.tsx - ОБНОВЛЕННЫЙ КОД СО СКЕЛЕТОНАМИ
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,10 +13,12 @@ import {
   Alert,
   StatusBar,
 } from 'react-native';
+import ActivitySkeleton from '../../components/Skeleton/ActivitySkeleton';
 
 const ActivitiesScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Фильтры
   const filters = [
@@ -33,7 +35,7 @@ const ActivitiesScreen = () => {
     {
       id: '1',
       name: 'Футбольная тренировка',
-      type: 'Спорт',
+      type: 'sport',
       age: '5-12 лет',
       price: '800 ₽',
       duration: '1.5 часа',
@@ -44,7 +46,7 @@ const ActivitiesScreen = () => {
     {
       id: '2',
       name: 'Художественная студия',
-      type: 'Творчество',
+      type: 'art',
       age: '4-10 лет',
       price: '600 ₽',
       duration: '1 час',
@@ -55,7 +57,7 @@ const ActivitiesScreen = () => {
     {
       id: '3',
       name: 'Программирование для детей',
-      type: 'Наука',
+      type: 'science',
       age: '8-14 лет',
       price: '1000 ₽',
       duration: '2 часа',
@@ -66,7 +68,7 @@ const ActivitiesScreen = () => {
     {
       id: '4',
       name: 'Бальные танцы',
-      type: 'Танцы',
+      type: 'dance',
       age: '6-15 лет',
       price: '700 ₽',
       duration: '1.5 часа',
@@ -75,6 +77,15 @@ const ActivitiesScreen = () => {
       image: 'https://via.placeholder.com/300x200/E91E63/FFFFFF?text=Танцы',
     },
   ];
+
+  // Имитация загрузки данных
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const toggleFilter = (filterId: string) => {
     setSelectedFilters(prev =>
@@ -95,7 +106,7 @@ const ActivitiesScreen = () => {
   const filteredActivities = activities.filter(activity => {
     const matchesSearch = activity.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          activity.type.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = selectedFilters.length === 0 || selectedFilters.includes(activity.type.toLowerCase());
+    const matchesFilter = selectedFilters.length === 0 || selectedFilters.includes(activity.type);
     return matchesSearch && matchesFilter;
   });
 
@@ -105,7 +116,7 @@ const ActivitiesScreen = () => {
       <View style={styles.activityInfo}>
         <Text style={styles.activityName} numberOfLines={2}>{item.name}</Text>
         <View style={styles.activityMeta}>
-          <Text style={styles.activityType}>{item.type}</Text>
+          <Text style={styles.activityType}>{filters.find(f => f.id === item.type)?.name}</Text>
           <Text style={styles.activityAge}>{item.age}</Text>
         </View>
         <View style={styles.activityDetails}>
@@ -126,6 +137,14 @@ const ActivitiesScreen = () => {
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
+  );
+
+  const renderSkeleton = () => (
+    <View style={styles.skeletonContainer}>
+      {[1, 2, 3, 4].map((item) => (
+        <ActivitySkeleton key={item} />
+      ))}
+    </View>
   );
 
   return (
@@ -176,15 +195,20 @@ const ActivitiesScreen = () => {
         {/* Результаты */}
         <View style={styles.resultsSection}>
           <Text style={styles.sectionTitle}>
-            Найдено {filteredActivities.length} занятий
+            {isLoading ? 'Загрузка занятий...' : `Найдено ${filteredActivities.length} занятий`}
           </Text>
-          <FlatList
-            data={filteredActivities}
-            renderItem={renderActivity}
-            keyExtractor={item => item.id}
-            scrollEnabled={false}
-            showsVerticalScrollIndicator={false}
-          />
+          
+          {isLoading ? (
+            renderSkeleton()
+          ) : (
+            <FlatList
+              data={filteredActivities}
+              renderItem={renderActivity}
+              keyExtractor={item => item.id}
+              scrollEnabled={false}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -260,6 +284,9 @@ const styles = StyleSheet.create({
   },
   resultsSection: {
     paddingHorizontal: 20,
+  },
+  skeletonContainer: {
+    gap: 16,
   },
   activityCard: {
     backgroundColor: '#FFFFFF',

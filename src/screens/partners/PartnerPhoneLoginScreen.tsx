@@ -8,14 +8,20 @@ import {
   TextInput,
   Alert,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+
+// Сервис хранения
+import { SecureStorage, PartnerData } from '../../services/StorageService';
+import { SimpleStorage } from '../../services/StorageService';
 
 const PartnerPhoneLoginScreen = () => {
   const navigation = useNavigation();
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [step, setStep] = useState(1); // 1 - ввод телефона, 2 - ввод кода
+  const [isLoading, setIsLoading] = useState(false);
 
   // Форматирование телефона
   const formatPhone = (text: string) => {
@@ -37,14 +43,69 @@ const PartnerPhoneLoginScreen = () => {
     setStep(2);
   };
 
-  const handleVerifyCode = () => {
+  const handleVerifyCode = async () => {
     if (code.length !== 4) {
       Alert.alert('Ошибка', 'Введите 4-значный код');
       return;
     }
-    // Здесь будет API проверки кода
-    Alert.alert('Успешно', 'Вход для партнера выполнен!');
-    // navigation.navigate('PartnerMain');
+
+    setIsLoading(true);
+    
+    try {
+      // Здесь будет API проверки кода
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Создаем mock партнерский токен
+      const mockPartnerToken = 'partner_token_' + Date.now();
+      
+      // Сохраняем партнерский токен
+      await SecureStorage.setPartnerToken(mockPartnerToken);
+      
+      // Создаем mock данные партнера
+      const mockPartnerData: PartnerData = {
+        id: 'partner_' + Date.now(),
+        organizationName: 'Тестовая организация',
+        phone: phone,
+        email: 'partner@example.com',
+        address: 'Москва, ул. Тестовая, 1',
+        description: 'Описание деятельности партнера',
+        status: 'approved',
+        registrationDate: new Date().toISOString(),
+      };
+      
+      // Сохраняем данные партнера
+      await SecureStorage.setPartnerData(mockPartnerData);
+      
+      // Сохраняем настройки приложения
+      await SimpleStorage.setAppSettings({
+        notifications: true,
+        emailNotifications: false,
+        location: 'Moscow',
+        userType: 'partner',
+      });
+      
+      console.log('Partner login completed, data saved securely');
+      
+      Alert.alert(
+        'Успешно!', 
+        'Вход для партнера выполнен!', 
+        [
+          { 
+            text: 'OK', 
+            onPress: () => {
+              // navigation.navigate('PartnerMain' as never);
+              navigation.navigate('PartnerChoice' as never);
+            }
+          }
+        ]
+      );
+      
+    } catch (error) {
+      console.error('Partner login failed:', error);
+      Alert.alert('Ошибка', 'Не удалось выполнить вход');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -97,9 +158,23 @@ const PartnerPhoneLoginScreen = () => {
                 />
               </View>
 
-              <TouchableOpacity style={styles.continueButton} onPress={handleVerifyCode}>
-                <Text style={styles.continueButtonText}>Войти в партнерский аккаунт</Text>
+              <TouchableOpacity 
+                style={[styles.continueButton, isLoading && styles.continueButtonDisabled]} 
+                onPress={handleVerifyCode}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.continueButtonText}>Войти в партнерский аккаунт</Text>
+                )}
               </TouchableOpacity>
+
+              {isLoading && (
+                <Text style={styles.loadingText}>
+                  Сохраняем данные безопасно...
+                </Text>
+              )}
 
               <TouchableOpacity style={styles.resendButton} onPress={handleSendCode}>
                 <Text style={styles.resendText}>Отправить код повторно</Text>
@@ -200,6 +275,10 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
+  continueButtonDisabled: {
+    backgroundColor: '#666666',
+    opacity: 0.7,
+  },
   continueButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
@@ -212,6 +291,12 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontSize: 14,
     textDecorationLine: 'underline',
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#666666',
+    textAlign: 'center',
+    marginTop: 12,
   },
 });
 

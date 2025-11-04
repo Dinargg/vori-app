@@ -1,0 +1,89 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/SanFranciscoDisplay-Black.otf",
+      "sha1": "cd157edb2b3c351e4730bb2df260eb1e01c67502"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoDisplay-Bold.otf",
+      "sha1": "f65f4621d394122c4fe4f1de08863c7ee93aef83"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoDisplay-Heavy.otf",
+      "sha1": "7014bfc9bba6cfc744ed2933f348c03830132523"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoDisplay-Light.otf",
+      "sha1": "79265be1c3a25d41b7aa0c310cbd3b8207e95b80"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoDisplay-Medium.otf",
+      "sha1": "ee35aba78d832f93083ee5e1a9ee5607da915968"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoDisplay-Regular.otf",
+      "sha1": "ec76f62f9e75662eef0b5cd34232ed1706126f0f"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoDisplay-Semibold.otf",
+      "sha1": "dcf26eadbc33d1e06a07d14ab954f653ae0db8c9"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoDisplay-Thin.otf",
+      "sha1": "074e62cec553c793404141c5b0b7a8225c55d0e0"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoDisplay-Ultralight.otf",
+      "sha1": "7e38d154671cdcb8b8b80b28f732f731ac8a0fcd"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoText-Bold.otf",
+      "sha1": "cd80d114605f3c610f510e16eb4bdad91131137e"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoText-BoldItalic.otf",
+      "sha1": "653e64d51802c0b5140fe60d6154006efb47d939"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoText-Heavy.otf",
+      "sha1": "c4f7f0d6267d093d3e7cea3d55f58b9a4b6e3402"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoText-HeavyItalic.otf",
+      "sha1": "d5099cfbd7695971c9a950369228432fd721ca6b"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoText-Light.otf",
+      "sha1": "e40722e5d4f00c19182f6770c58a8e1e4d45b973"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoText-LightItalic.otf",
+      "sha1": "c628e52332b45591b69672fba70e7b60babf23de"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoText-Medium.otf",
+      "sha1": "466d3293397addb52460a0a2430111c7d83de278"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoText-MediumItalic.otf",
+      "sha1": "6b691cd9c47746724c143139c2f145d963670bd6"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoText-Regular.otf",
+      "sha1": "98ccf0758f76de2c12ddf133968cd6292bc47134"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoText-RegularItalic.otf",
+      "sha1": "bea6a9bc470264de65952502eb6e1b8a1c15195f"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoText-Semibold.otf",
+      "sha1": "4f12f56fac6ef0c3cd6cf759e915c32e81bf7e05"
+    },
+    {
+      "path": "assets/fonts/SanFranciscoText-SemiboldItalic.otf",
+      "sha1": "87d527fc163478981bdc9fa47cdddf8d4f2073b6"
+    }
+  ]
+}

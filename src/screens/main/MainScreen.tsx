@@ -1,5 +1,5 @@
-// src/screens/main/MainScreen.tsx - С ШРИФТАМИ SF PRO DISPLAY
-import React from 'react';
+// src/screens/main/MainScreen.tsx - С ПРАВИЛЬНЫМ ВЫРАВНИВАНИЕМ ЛОГОТИПА
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,33 +8,133 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { 
   MagnifyingGlass, 
   Bell, 
   MapPin, 
-  Heart, 
-  Star
+  Heart,
+  Faders
 } from 'phosphor-react-native';
+
+// Новые компоненты
+import CategoryGrid from '../../components/CategoryGrid/CategoryGrid';
+import FavoriteActivities from '../../components/FavoriteActivities/FavoriteActivities';
+import QuickSearch from '../../components/QuickSearch/QuickSearch';
 import BannerCarousel from '../../components/BannerCarousel';
 
 const { width } = Dimensions.get('window');
 
 const MainScreen: React.FC = () => {
+  const [currentLocation, setCurrentLocation] = useState('Москва');
+
+  // Mock данные для избранного
+  const favoriteActivities = [
+    {
+      id: '1',
+      name: 'Футбольная академия "Чемпион"',
+      type: 'sport',
+      rating: 4.8,
+      price: '2 500 ₽/мес',
+      image: 'https://via.placeholder.com/300x200/4A90E2/FFFFFF?text=Футбол',
+      location: '5 мин от метро'
+    },
+    {
+      id: '2',
+      name: 'Художественная студия "Радуга"',
+      type: 'art',
+      rating: 4.6,
+      price: '1 800 ₽/мес',
+      image: 'https://via.placeholder.com/300x200/9C27B0/FFFFFF?text=Рисование',
+      location: '10 мин от метро'
+    },
+    {
+      id: '3',
+      name: 'Программирование для детей',
+      type: 'science',
+      rating: 4.9,
+      price: '3 200 ₽/мес',
+      image: 'https://via.placeholder.com/300x200/00BCD4/FFFFFF?text=Программирование',
+      location: '15 мин от метро'
+    },
+  ];
+
+  // Обработчики событий
+  const handleCategoryPress = (category: any) => {
+    Alert.alert(
+      'Категория',
+      `Выбрана категория: ${category.name}`,
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleFavoritePress = (activity: any) => {
+    Alert.alert(
+      'Избранное',
+      `Открыть "${activity.name}"?`,
+      [
+        { text: 'Отмена', style: 'cancel' },
+        { text: 'Открыть', onPress: () => {
+          // Навигация к детальной странице занятия
+          Alert.alert('Успех', 'Переход к занятию (в разработке)');
+        }}
+      ]
+    );
+  };
+
+  const handleSeeAllFavorites = () => {
+    Alert.alert('Избранное', 'Открыть все избранные занятия (в разработке)');
+  };
+
+  const handleQuickFilterPress = (filter: any) => {
+    switch (filter.type) {
+      case 'location':
+        Alert.alert('Локация', `Поиск занятий в ${currentLocation} (в разработке)`);
+        break;
+      case 'filter':
+        Alert.alert('Фильтры', 'Открыть расширенные фильтры (в разработке)');
+        break;
+      case 'time':
+        Alert.alert('Сегодня', 'Занятия на сегодня (в разработке)');
+        break;
+      case 'rating':
+        Alert.alert('Топ', 'Лучшие занятия по рейтингу (в разработке)');
+        break;
+    }
+  };
+
+  const handleSearchPress = () => {
+    Alert.alert('Поиск', 'Открыть экран поиска (в разработке)');
+  };
+
+  const handleNotificationsPress = () => {
+    Alert.alert('Уведомления', 'Открыть уведомления (в разработке)');
+  };
+
+  const handleLocationPress = () => {
+    Alert.alert('Локация', 'Сменить город (в разработке)');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Шапка с локацией и действиями */}
+      {/* Шапка с логотипом и действиями */}
       <View style={styles.header}>
-        <View style={styles.locationContainer}>
+        <TouchableOpacity 
+          style={styles.locationContainer}
+          onPress={handleLocationPress}
+        >
           <MapPin size={20} color="#007AFF" />
-          <Text style={styles.locationText}>Москва</Text>
+          <Text style={styles.locationText}>{currentLocation}</Text>
+        </TouchableOpacity>
+        
+        {/* Логотип приложения по центру - абсолютное позиционирование */}
+        <View style={styles.logoContainer}>
+          <Text style={styles.logoText}>VORI</Text>
         </View>
         
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Heart size={24} color="#333" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity style={styles.iconButton} onPress={handleNotificationsPress}>
             <Bell size={24} color="#333" />
           </TouchableOpacity>
         </View>
@@ -45,83 +145,35 @@ const MainScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Приветствие */}
-        <View style={styles.welcomeSection}>
-          <Text style={styles.welcomeTitle}>Найдите занятия для ребенка</Text>
-          <Text style={styles.welcomeSubtitle}>Секции, кружки и курсы рядом с вами</Text>
-        </View>
-
         {/* Поиск */}
-        <TouchableOpacity style={styles.searchContainer}>
+        <TouchableOpacity style={styles.searchContainer} onPress={handleSearchPress}>
           <View style={styles.searchInput}>
             <MagnifyingGlass size={20} color="#8E8E93" />
             <Text style={styles.searchPlaceholder}>Поиск секций, кружков, курсов...</Text>
+            <Faders size={20} color="#8E8E93" />
           </View>
         </TouchableOpacity>
+
+        {/* Быстрый поиск */}
+        <QuickSearch 
+          onFilterPress={handleQuickFilterPress}
+          currentLocation={currentLocation}
+        />
 
         {/* Карусель баннеров */}
         <BannerCarousel />
 
+        {/* Избранное */}
+        <FavoriteActivities 
+          activities={favoriteActivities}
+          onActivityPress={handleFavoritePress}
+          onSeeAllPress={handleSeeAllFavorites}
+        />
+
         {/* Категории занятий */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Категории</Text>
-          <View style={styles.categoriesGrid}>
-            <TouchableOpacity style={styles.categoryItem}>
-              <View style={styles.categoryIcon}>
-                <Text style={styles.emoji}>⚽</Text>
-              </View>
-              <Text style={styles.categoryText}>Спорт</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.categoryItem}>
-              <View style={styles.categoryIcon}>
-                <Text style={styles.emoji}>🎨</Text>
-              </View>
-              <Text style={styles.categoryText}>Творчество</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.categoryItem}>
-              <View style={styles.categoryIcon}>
-                <Text style={styles.emoji}>🔬</Text>
-              </View>
-              <Text style={styles.categoryText}>Наука</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.categoryItem}>
-              <View style={styles.categoryIcon}>
-                <Text style={styles.emoji}>💃</Text>
-              </View>
-              <Text style={styles.categoryText}>Танцы</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.categoryItem}>
-              <View style={styles.categoryIcon}>
-                <Text style={styles.emoji}>🎭</Text>
-              </View>
-              <Text style={styles.categoryText}>Театр</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.categoryItem}>
-              <View style={styles.categoryIcon}>
-                <Text style={styles.emoji}>🎵</Text>
-              </View>
-              <Text style={styles.categoryText}>Музыка</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.categoryItem}>
-              <View style={styles.categoryIcon}>
-                <Text style={styles.emoji}>♟️</Text>
-              </View>
-              <Text style={styles.categoryText}>Шахматы</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.categoryItem}>
-              <View style={styles.categoryIcon}>
-                <Text style={styles.emoji}>🗣️</Text>
-              </View>
-              <Text style={styles.categoryText}>Языки</Text>
-            </TouchableOpacity>
-          </View>
+          <CategoryGrid onCategoryPress={handleCategoryPress} />
         </View>
 
         {/* Популярные секции */}
@@ -141,7 +193,7 @@ const MainScreen: React.FC = () => {
                 <Text style={styles.courseDescription}>Для детей 6-12 лет • 2 раза в неделю</Text>
                 <View style={styles.courseMeta}>
                   <View style={styles.ratingContainer}>
-                    <Star size={16} color="#FFD700" weight="fill" />
+                    <Heart size={16} color="#FFD700" weight="fill" />
                     <Text style={styles.rating}>4.9</Text>
                     <Text style={styles.reviewsCount}>(124)</Text>
                   </View>
@@ -161,7 +213,7 @@ const MainScreen: React.FC = () => {
                 <Text style={styles.courseDescription}>Рисование для детей 4-10 лет • 1 раз в неделю</Text>
                 <View style={styles.courseMeta}>
                   <View style={styles.ratingContainer}>
-                    <Star size={16} color="#FFD700" weight="fill" />
+                    <Heart size={16} color="#FFD700" weight="fill" />
                     <Text style={styles.rating}>4.8</Text>
                     <Text style={styles.reviewsCount}>(89)</Text>
                   </View>
@@ -193,10 +245,12 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#F2F2F7',
+    position: 'relative', // Для абсолютного позиционирования логотипа
   },
   locationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    zIndex: 1, // Чтобы был поверх логотипа
   },
   locationText: {
     fontFamily: 'SanFranciscoDisplay-Medium',
@@ -204,11 +258,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#007AFF',
   },
+  logoContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    pointerEvents: 'none', // Чтобы не блокировал клики на другие элементы
+  },
+  logoText: {
+    fontFamily: 'SanFranciscoDisplay-Bold',
+    fontSize: 20,
+    color: '#000000',
+    letterSpacing: 1,
+  },
   headerActions: {
     flexDirection: 'row',
+    zIndex: 1, // Чтобы был поверх логотипа
   },
   iconButton: {
-    marginLeft: 15,
     padding: 5,
   },
   scrollView: {
@@ -217,28 +287,15 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 30,
   },
-  welcomeSection: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-  },
-  welcomeTitle: {
-    fontFamily: 'SanFranciscoDisplay-Bold',
-    fontSize: 28,
-    color: '#000000',
-    marginBottom: 5,
-  },
-  welcomeSubtitle: {
-    fontFamily: 'SanFranciscoDisplay-Regular',
-    fontSize: 16,
-    color: '#8E8E93',
-  },
   searchContainer: {
     paddingHorizontal: 20,
     marginBottom: 10,
+    marginTop: 10,
   },
   searchInput: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: '#F2F2F7',
     paddingHorizontal: 15,
     paddingVertical: 12,
@@ -246,9 +303,10 @@ const styles = StyleSheet.create({
   },
   searchPlaceholder: {
     fontFamily: 'SanFranciscoDisplay-Regular',
-    marginLeft: 10,
     fontSize: 16,
     color: '#8E8E93',
+    flex: 1,
+    marginHorizontal: 10,
   },
   section: {
     marginTop: 25,
@@ -269,35 +327,6 @@ const styles = StyleSheet.create({
     fontFamily: 'SanFranciscoDisplay-Medium',
     fontSize: 16,
     color: '#007AFF',
-  },
-  categoriesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-  },
-  categoryItem: {
-    alignItems: 'center',
-    width: (width - 60) / 4,
-    marginBottom: 20,
-  },
-  categoryIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-    backgroundColor: '#F8F8F8',
-  },
-  emoji: {
-    fontSize: 28,
-  },
-  categoryText: {
-    fontFamily: 'SanFranciscoDisplay-Medium',
-    fontSize: 13,
-    textAlign: 'center',
-    color: '#000000',
   },
   coursesList: {
     paddingHorizontal: 20,

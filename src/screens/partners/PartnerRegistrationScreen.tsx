@@ -8,8 +8,13 @@ import {
   TextInput,
   Alert,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+
+// Сервис хранения
+import { SecureStorage, PartnerData } from '../../services/StorageService';
+import { SimpleStorage } from '../../services/StorageService';
 
 const PartnerRegistrationScreen = () => {
   const navigation = useNavigation();
@@ -20,8 +25,9 @@ const PartnerRegistrationScreen = () => {
     address: '',
     description: '',
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!formData.organizationName.trim()) {
       Alert.alert('Ошибка', 'Введите название организации');
       return;
@@ -35,12 +41,61 @@ const PartnerRegistrationScreen = () => {
       return;
     }
     
-    // Здесь будет API регистрации
-    Alert.alert(
-      'Заявка отправлена',
-      'Мы свяжемся с вами для подтверждения регистрации в течение 24 часов',
-      [{ text: 'OK', onPress: () => navigation.navigate('PartnerChoice' as never) }]
-    );
+    setIsLoading(true);
+    
+    try {
+      // Имитация обработки заявки
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Создаем mock партнерский токен
+      const mockPartnerToken = 'partner_token_' + Date.now();
+      
+      // Сохраняем партнерский токен
+      await SecureStorage.setPartnerToken(mockPartnerToken);
+      
+      // Подготавливаем данные партнера
+      const partnerData: PartnerData = {
+        id: 'partner_' + Date.now(),
+        organizationName: formData.organizationName,
+        phone: formData.phone,
+        email: formData.email,
+        address: formData.address,
+        description: formData.description,
+        status: 'pending',
+        registrationDate: new Date().toISOString(),
+      };
+      
+      // Сохраняем данные партнера
+      await SecureStorage.setPartnerData(partnerData);
+      
+      // Сохраняем настройки приложения
+      await SimpleStorage.setAppSettings({
+        notifications: true,
+        emailNotifications: false,
+        location: 'Moscow',
+        userType: 'partner',
+      });
+      
+      console.log('Partner registration completed, data saved securely');
+      
+      Alert.alert(
+        'Заявка отправлена!',
+        'Мы свяжемся с вами для подтверждения регистрации в течение 24 часов.',
+        [{ 
+          text: 'OK', 
+          onPress: () => navigation.navigate('PartnerChoice' as never) 
+        }]
+      );
+      
+    } catch (error) {
+      console.error('Partner registration failed:', error);
+      Alert.alert(
+        'Ошибка',
+        'Не удалось отправить заявку. Попробуйте еще раз.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Форматирование телефона
@@ -134,9 +189,25 @@ const PartnerRegistrationScreen = () => {
               * После отправки заявки мы свяжемся с вами для подтверждения регистрации
             </Text>
 
-            <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-              <Text style={styles.registerButtonText}>Отправить заявку</Text>
+            <TouchableOpacity 
+              style={[styles.registerButton, isLoading && styles.registerButtonDisabled]} 
+              onPress={handleRegister}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.registerButtonText}>
+                  Отправить заявку
+                </Text>
+              )}
             </TouchableOpacity>
+
+            {isLoading && (
+              <Text style={styles.loadingText}>
+                Сохраняем данные безопасно...
+              </Text>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -231,10 +302,20 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
   },
+  registerButtonDisabled: {
+    backgroundColor: '#666666',
+    opacity: 0.7,
+  },
   registerButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#666666',
+    textAlign: 'center',
+    marginTop: 12,
   },
 });
 

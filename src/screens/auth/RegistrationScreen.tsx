@@ -1,6 +1,6 @@
-// src/screens/auth/RegistrationScreen.tsx - ПОЛНЫЙ ОБНОВЛЕННЫЙ КОД
+// src/screens/auth/RegistrationScreen.tsx - ОБНОВЛЕННЫЙ КОД С СОХРАНЕНИЕМ ДАННЫХ
 import React, { useState } from 'react';
-import { View, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { View, StyleSheet, SafeAreaView, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 // Импорты из папки components/Registration/ - ПРАВИЛЬНЫЙ ПУТЬ!
@@ -10,9 +10,13 @@ import RegistrationStep2 from '../../components/Registration/RegistrationStep2';
 import RegistrationStep3 from '../../components/Registration/RegistrationStep3';
 import RegistrationStep4 from '../../components/Registration/RegistrationStep4';
 
+// Сервис хранения
+import { SecureStorage, UserData, ChildData } from '../../services/StorageService';
+
 const RegistrationScreen = () => {
   const navigation = useNavigation();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     // Step 1 данные
     firstName: '',
@@ -52,10 +56,65 @@ const RegistrationScreen = () => {
     }
   };
 
-  // ОБНОВЛЕННАЯ ФУНКЦИЯ - теперь ведет на MainTabs
-  const handleCompleteRegistration = () => {
-    // Здесь будет API вызов для завершения регистрации
-    navigation.navigate('MainTabs' as never);
+  // ОБНОВЛЕННАЯ ФУНКЦИЯ - с сохранением данных
+  const handleCompleteRegistration = async () => {
+    setIsLoading(true);
+    
+    try {
+      // Имитация API вызова для регистрации
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Создаем mock токен (в реальном приложении придет с бэкенда)
+      const mockToken = 'mock_jwt_token_' + Date.now();
+      
+      // Сохраняем токен безопасно
+      await SecureStorage.setAuthToken(mockToken);
+      
+      // Подготавливаем данные пользователя
+      const userData: UserData = {
+        id: 'user_' + Date.now(),
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+      };
+      
+      // Сохраняем данные пользователя
+      await SecureStorage.setUserData(userData);
+      
+      // Если есть данные ребенка - сохраняем их
+      if (formData.childName && formData.childBirthDate) {
+        const childData: ChildData = {
+          id: 'child_' + Date.now(),
+          name: formData.childName,
+          birthDate: formData.childBirthDate,
+          gender: formData.childGender,
+          healthInfo: formData.childHealthInfo || '',
+        };
+        
+        await SecureStorage.setChildrenData([childData]);
+      }
+      
+      console.log('Registration completed, data saved securely');
+      
+      Alert.alert(
+        'Регистрация завершена!',
+        'Ваш аккаунт успешно создан. Данные сохранены безопасно.',
+        [{ 
+          text: 'Отлично', 
+          onPress: () => navigation.navigate('MainTabs' as never)
+        }]
+      );
+      
+    } catch (error) {
+      console.error('Registration failed:', error);
+      Alert.alert(
+        'Ошибка',
+        'Не удалось завершить регистрацию. Попробуйте еще раз.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderStep = () => {
@@ -90,6 +149,7 @@ const RegistrationScreen = () => {
             formData={formData}
             prevStep={prevStep}
             onComplete={handleCompleteRegistration}
+            isLoading={isLoading}
           />
         );
       default:

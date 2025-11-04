@@ -1,17 +1,29 @@
-// src/components/Registration/RegistrationStep4.tsx - ПОЛНЫЙ ОБНОВЛЕННЫЙ КОД
+// src/components/Registration/RegistrationStep4.tsx - ОБНОВЛЕННЫЙ КОД С СОСТОЯНИЕМ ЗАГРУЗКИ
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
 
-const RegistrationStep4 = ({ formData, prevStep, onComplete }) => {
+interface RegistrationStep4Props {
+  formData: any;
+  prevStep: () => void;
+  onComplete: () => void;
+  isLoading?: boolean;
+}
+
+const RegistrationStep4 = ({ formData, prevStep, onComplete, isLoading = false }: RegistrationStep4Props) => {
 
   const handleComplete = () => {
+    if (isLoading) return;
+    
     Alert.alert(
-      'Регистрация завершена!',
-      'Ваш аккаунт успешно создан. Теперь вы можете найти занятия для вашего ребенка.',
-      [{ 
-        text: 'Отлично', 
-        onPress: () => onComplete()
-      }]
+      'Подтверждение',
+      'Все данные верны? После завершения они будут сохранены безопасно.',
+      [
+        { text: 'Проверить еще', style: 'cancel' },
+        { 
+          text: 'Все верно', 
+          onPress: onComplete
+        }
+      ]
     );
   };
 
@@ -70,13 +82,31 @@ const RegistrationStep4 = ({ formData, prevStep, onComplete }) => {
         <Text style={styles.link}>Политикой конфиденциальности</Text>
       </Text>
 
-      <TouchableOpacity style={styles.completeButton} onPress={handleComplete}>
-        <Text style={styles.completeButtonText}>Завершить регистрацию</Text>
+      <TouchableOpacity 
+        style={[styles.completeButton, isLoading && styles.completeButtonDisabled]} 
+        onPress={handleComplete}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <ActivityIndicator color="#FFFFFF" />
+        ) : (
+          <Text style={styles.completeButtonText}>Завершить регистрацию</Text>
+        )}
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.backButton} onPress={prevStep}>
+      <TouchableOpacity 
+        style={[styles.backButton, isLoading && styles.backButtonDisabled]} 
+        onPress={prevStep}
+        disabled={isLoading}
+      >
         <Text style={styles.backButtonText}>Вернуться назад</Text>
       </TouchableOpacity>
+
+      {isLoading && (
+        <Text style={styles.loadingText}>
+          Сохраняем данные безопасно...
+        </Text>
+      )}
     </ScrollView>
   );
 };
@@ -140,6 +170,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
+  completeButtonDisabled: {
+    backgroundColor: '#666666',
+    opacity: 0.7,
+  },
   completeButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
@@ -153,10 +187,19 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     marginBottom: 40,
   },
+  backButtonDisabled: {
+    opacity: 0.5,
+  },
   backButtonText: {
     color: '#666666',
     fontSize: 16,
     fontWeight: '500',
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#666666',
+    textAlign: 'center',
+    marginTop: 12,
   },
 });
 
